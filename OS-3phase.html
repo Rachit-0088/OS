@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧠 Advanced CPU Scheduling Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glow: rgba(99, 102, 241, 0.5);
+            --chat-bg: rgba(25, 30, 45, 0.9);
+            --green: #10b981;
+            --gray: #4b5563;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--light);
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+
+        .education-section {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .education-section h2 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .education-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .edu-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .edu-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
+            border-color: var(--primary);
+        }
+
+        .edu-card i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+            color: #fbbf24;
+        }
+
+        .edu-card h3 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+        }
+
+        .algo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .algo-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(236, 72, 153, 0.3));
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .algo-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+        }
+
+        .section {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .input-group input, .input-group select {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--glow);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent), #f97316);
+            color: white;
+        }
+
+        .process-list {
+            margin-top: 20px;
+        }
+
+        .process-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .gantt-container {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .gantt-chart {
+            display: flex;
+            min-height: 100px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .gantt-block {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            font-weight: 600;
+            color: white;
+            position: relative;
+            transition: all 0.5s ease;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: scaleX(0);
+                opacity: 0;
+            }
+            to {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        .gantt-timeline {
+            display: flex;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
+            padding-top: 10px;
+        }
+
+        .timeline-mark {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.3));
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .metric-card i {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .results-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+
+        .results-table th, .results-table td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-table th {
+            background: rgba(99, 102, 241, 0.4);
+            font-weight: 600;
+        }
+
+        .results-table tr {
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .results-table tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .llm-explanation {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.2), rgba(139, 92, 246, 0.2));
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            line-height: 1.8;
+        }
+
+        .llm-explanation h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        select option {
+            background: #1e293b;
+            color: white;
+        }
+        
+        /* --- HOW IT WORKS & ANIMATION SECTION STYLES --- */
+        .how-it-works-container {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .visual-explanation-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            align-items: flex-start;
+            min-height: 250px;
+        }
+        .visual-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .visual-box h3 {
+            text-align: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+        .visual-process-card {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+        .cpu-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        .cpu-icon {
+            font-size: 5em;
+            color: var(--accent);
+            animation: pulse-cpu 2s infinite ease-in-out;
+        }
+        @keyframes pulse-cpu {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        #visualCpuBox .visual-process-card {
+            border: 2px dashed var(--green);
+            font-size: 1.2em;
+            width: 120px;
+        }
+        .explanation-box {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            min-height: 100px;
+        }
+        /* --- END HOW IT WORKS STYLES --- */
+        
+        /* --- AI CHAT WIDGET STYLES --- */
+        .chat-toggle-btn { position: fixed; bottom: 30px; right: 30px; width: 150px; height: 50px; background: linear-gradient(45deg, var(--accent), var(--secondary)); color: white; border: none; border-radius: 25px; font-weight: 600; cursor: pointer; box-shadow: 0 5px 20px rgba(236, 72, 153, 0.5); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .chat-toggle-btn:hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(236, 72, 153, 0.7); }
+        .chat-box { position: fixed; bottom: 100px; right: 30px; width: 380px; height: 500px; background: var(--chat-bg); backdrop-filter: blur(15px); border-radius: 15px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); display: flex; flex-direction: column; opacity: 1; transform: translateY(0); transition: opacity 0.3s ease, transform 0.3s ease; z-index: 1000; }
+        .hidden-chat { opacity: 0; transform: translateY(20px); pointer-events: none; }
+        .chat-header { padding: 15px; background: linear-gradient(90deg, var(--primary), var(--secondary)); color: white; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center; }
+        .chat-close-btn { background: none; border: none; color: white; font-size: 1.5em; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
+        .chat-close-btn:hover { opacity: 1; }
+        .chat-body { flex-grow: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .chat-body::-webkit-scrollbar { width: 8px; }
+        .chat-body::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+        .chat-footer { display: flex; padding: 15px; gap: 10px; }
+        #chatInput { flex-grow: 1; padding: 10px; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; background: rgba(255, 255, 255, 0.1); color: white; font-family: 'Poppins', sans-serif; transition: border-color 0.2s; }
+        #chatInput:focus { outline: none; border-color: var(--primary); }
+        #chatSendBtn { background: var(--primary); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+        #chatSendBtn:hover { background: var(--secondary); transform: scale(1.05); }
+        .user-message, .ai-message { max-width: 85%; padding: 10px 15px; border-radius: 15px; line-height: 1.4; word-wrap: break-word; font-size: 0.9em; }
+        .user-message { align-self: flex-end; background: var(--primary); border-bottom-right-radius: 4px; }
+        .ai-message { align-self: flex-start; background: rgba(255, 255, 255, 0.15); border-bottom-left-radius: 4px; position: relative; }
+        .ai-message pre { white-space: pre-wrap; font-family: 'Poppins', sans-serif; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 5px; margin-top: 5px; }
+        .typing-indicator { display: inline-block; width: 8px; height: 8px; margin: 0 2px; border-radius: 50%; background-color: var(--accent); opacity: 0; animation: pulse 1s infinite; }
+        .typing-indicator:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 2em; }
+            .education-cards, .algo-grid, .input-grid, .metrics-grid, .visual-explanation-area { grid-template-columns: 1fr; }
+            .chat-box { width: 100%; right: 0; bottom: 0; border-radius: 20px 20px 0 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-microchip"></i> Advanced CPU Scheduling Simulator</h1>
+            <p>Interactive Learning Platform with AI-Powered Explanations</p>
+        </div>
+
+        <!-- Education Section -->
+        <div class="education-section">
+            <h2><i class="fas fa-graduation-cap"></i> Learn CPU Scheduling</h2>
+            <div class="education-cards">
+                <div class="edu-card"><i class="fas fa-microchip"></i><h3>What is a CPU?</h3><p>The CPU, or Central Processing Unit, is the brain of a computer, responsible for executing instructions. It can only execute one instruction at a time, so when multiple programs are waiting, CPU scheduling algorithms decide the order of execution. This helps the CPU manage tasks efficiently, reduce waiting time, and keep the system responsive.</p></div>
+                <div class="edu-card"><i class="fas fa-tasks"></i><h3>CPU Scheduling</h3><p>CPU scheduling is the process of deciding which of the ready processes in the system will get the CPU next. The goal is to maximize CPU utilization, reduce waiting time, and improve system performance by executing processes in an orderly manner based on the chosen scheduling method.</p></div>
+                <div class="edu-card"><i class="fas fa-rocket"></i><h3>Real-World Example</h3><p>In the real world, CPU scheduling is like a manager deciding which task to handle next. For example, in a queue, First Come First Serve is like serving people in the order they arrive. Shortest Job First is like serving the person with the fewest items first to speed up the line. Round Robin is like giving each person a small turn. These algorithms help the CPU manage multiple tasks efficiently.</p></div>
+            </div>
+            <h3 style="margin-top: 40px; margin-bottom: 20px;"><i class="fas fa-layer-group"></i> Scheduling Algorithms Overview</h3>
+            <div class="algo-grid">
+                <div class="algo-card"><h4>🎯 FCFS</h4><p>The process that arrives first gets executed first. Simple but can have long waits.</p></div>
+                <div class="algo-card"><h4>⚡ SJF</h4><p>Selects the process with the shortest execution time next. Reduces average waiting time.</p></div>
+                <div class="algo-card"><h4>🔄 SRTF</h4><p>A preemptive version of SJF. A new short process can interrupt a running one.</p></div>
+                <div class="algo-card"><h4>⭐ Priority</h4><p>Selects the process with the highest priority. Can cause starvation for low-priority processes.</p></div>
+                <div class="algo-card"><h4>🔁 Round Robin</h4><p>Assigns a fixed time slice (quantum) to each process in a circular order, ensuring fairness.</p></div>
+                <div class="algo-card"><h4>⚖️ LJF</h4><p>Longest Job First. Selects the process with the longest burst time. Opposite of SJF.</p></div>
+                <div class="algo-card"><h4>⏳ LRTF</h4><p>Longest Remaining Time First. Preemptive version of LJF.</p></div>
+                <div class="algo-card"><h4>📈 HRRN</h4><p>Highest Response Ratio Next. Balances wait time and burst time to prevent starvation.</p></div>
+            </div>
+        </div>
+
+        <!-- Input Section (Unchanged) -->
+        <div class="section">
+            <h2><i class="fas fa-keyboard"></i> Process Configuration</h2>
+            <div class="input-grid">
+                <div class="input-group"><label>Process ID</label><input type="text" id="processId" placeholder="P1" value="P1"></div>
+                <div class="input-group"><label>Arrival Time</label><input type="number" id="arrivalTime" placeholder="0" value="0" min="0"></div>
+                <div class="input-group"><label>Burst Time</label><input type="number" id="burstTime" placeholder="5" value="5" min="1"></div>
+                <div class="input-group"><label>Priority (optional)</label><input type="number" id="priority" placeholder="1" value="1" min="1"></div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="addProcess()"><i class="fas fa-plus"></i> Add Process</button>
+                <button class="btn btn-secondary" onclick="clearProcesses()"><i class="fas fa-trash"></i> Clear All</button>
+            </div>
+            <div id="processList" class="process-list"></div>
+        </div>
+
+        <!-- Algorithm Selection (Updated) -->
+        <div class="section">
+            <h2><i class="fas fa-cogs"></i> Algorithm Selection</h2>
+            <div class="input-grid">
+                <div class="input-group"><label>Choose Algorithm</label>
+                    <select id="algorithm">
+                        <option value="fcfs">FCFS - First Come First Serve</option>
+                        <option value="sjf">SJF - Shortest Job First</option>
+                        <option value="srtf">SRTF - Shortest Remaining Time First</option>
+                        <option value="priority">Priority (Non-Preemptive)</option>
+                        <option value="priority_preemptive">Priority (Preemptive)</option>
+                        <option value="rr">Round Robin</option>
+                        <option value="ljf">LJF - Longest Job First</option>
+                        <option value="lrtf">LRTF - Longest Remaining Time First</option>
+                        <option value="hrrn">HRRN - Highest Response Ratio Next</option>
+                    </select>
+                </div>
+                <div class="input-group" id="quantumGroup"><label>Time Quantum (for RR)</label><input type="number" id="quantum" placeholder="4" value="4" min="1"></div>
+            </div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="runSimulation()"><i class="fas fa-play"></i> Run Simulation</button>
+                <button class="btn btn-accent" onclick="startVisualExplanation()"><i class="fas fa-chalkboard-teacher"></i> How It Works</button>
+            </div>
+        </div>
+        
+        <!-- NEW Visual Explanation Section -->
+        <div id="visualExplanationSection" class="section hidden">
+            <div class="how-it-works-container">
+                <h2 id="visualExplanationTitle"></h2>
+                <div class="visual-explanation-area">
+                    <div class="visual-box">
+                        <h3>Process Pool</h3>
+                        <div id="visualProcessPool"></div>
+                    </div>
+                    <div class="cpu-area">
+                        <i class="fas fa-arrow-right fa-2x"></i>
+                        <div class="visual-box">
+                            <h3>Ready Queue</h3>
+                            <div id="visualReadyQueue"></div>
+                        </div>
+                         <i class="fas fa-arrow-right fa-2x"></i>
+                    </div>
+                    <div class="cpu-area">
+                        <i class="fas fa-microchip cpu-icon"></i>
+                        <div class="visual-box" id="visualCpuBox">
+                            <h3>CPU</h3>
+                            <div id="visualCpu"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="explanation-box" id="visualExplanationLog"></div>
+                <div class="button-group" style="justify-content: center;">
+                    <button id="visualNextStepBtn" class="btn btn-secondary"><i class="fas fa-step-forward"></i> Next Step</button>
+                    <button onclick="hideVisualExplanation()" class="btn btn-secondary"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section (Unchanged) -->
+        <div id="resultsSection" class="section hidden">
+            <h2><i class="fas fa-chart-line"></i> Simulation Results</h2>
+            <div class="gantt-container"><h3><i class="fas fa-chart-bar"></i> Gantt Chart</h3><div id="ganttChart" class="gantt-chart"></div><div id="ganttTimeline" class="gantt-timeline"></div></div>
+            <h3 style="margin-top: 30px;"><i class="fas fa-table"></i> Process Details</h3>
+            <div style="overflow-x: auto;"><table class="results-table"><thead><tr><th>Process</th><th>Arrival Time</th><th>Burst Time</th><th>Priority</th><th>Completion Time</th><th>Turnaround Time</th><th>Waiting Time</th><th>Response Time</th></tr></thead><tbody id="resultsTableBody"></tbody></table></div>
+            <h3 style="margin-top: 30px;"><i class="fas fa-tachometer-alt"></i> Performance Metrics</h3>
+            <div class="metrics-grid">
+                <div class="metric-card"><i class="fas fa-clock" style="color: #fbbf24;"></i><div class="metric-label">Avg Waiting Time</div><div class="metric-value" id="avgWaiting">0</div><div class="metric-label">ms</div></div>
+                <div class="metric-card"><i class="fas fa-hourglass-half" style="color: #60a5fa;"></i><div class="metric-label">Avg Turnaround Time</div><div class="metric-value" id="avgTurnaround">0</div><div class="metric-label">ms</div></div>
+                <div class="metric-card"><i class="fas fa-bolt" style="color: #34d399;"></i><div class="metric-label">Avg Response Time</div><div class="metric-value" id="avgResponse">0</div><div class="metric-label">ms</div></div>
+                <div class="metric-card"><i class="fas fa-microchip" style="color: #a78bfa;"></i><div class="metric-label">CPU Utilization</div><div class="metric-value" id="cpuUtil">0%</div><div class="progress-bar"><div class="progress-fill" id="cpuUtilBar" style="width: 0%">0%</div></div></div>
+                <div class="metric-card"><i class="fas fa-chart-line" style="color: #f472b6;"></i><div class="metric-label">Throughput</div><div class="metric-value" id="throughput">0</div><div class="metric-label">proc/sec</div></div>
+            </div>
+        </div>
+
+        <!-- LLM Explanation Section (Unchanged) -->
+        <div id="llmSection" class="section hidden"><div class="llm-explanation"><h3><i class="fas fa-robot"></i> AI-Powered Analysis</h3><div id="llmExplanation"></div></div></div>
+    </div>
+
+    <!-- Floating AI Chat Widget (Unchanged) -->
+    <button id="aiChatToggle" onclick="toggleChat()" class="chat-toggle-btn"><i class="fas fa-robot"></i><span class="ml-2">Ask AI</span></button>
+    <div id="aiChatBox" class="chat-box hidden-chat"><div class="chat-header"><h3 class="flex items-center gap-2"><i class="fas fa-brain"></i> OS Assistant</h3><button onclick="toggleChat()" class="chat-close-btn">&times;</button></div><div id="chatBody" class="chat-body"><div class="ai-message">Hello! I'm your **OS Assistant**. Ask me anything about CPU scheduling!</div></div><div class="chat-footer"><input type="text" id="chatInput" placeholder="Type your question..." onkeydown="handleChatInput(event)"><button id="chatSendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button></div></div>
+
+    <script>
+        // Global variables
+        let processes = [];
+        let processCounter = 1;
+        const processColors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+        
+        // --- SIMULATOR LOGIC ---
+        function addProcess() {
+            const id = document.getElementById('processId').value || `P${processCounter}`;
+            const arrival = parseInt(document.getElementById('arrivalTime').value) || 0;
+            const burst = parseInt(document.getElementById('burstTime').value) || 5;
+            const priority = parseInt(document.getElementById('priority').value) || 1;
+            if (burst <= 0) { console.error('Burst time must be greater than 0'); return; }
+            processes.push({ id, arrival, burst, priority, color: processColors[processes.length % processColors.length] });
+            processCounter++;
+            document.getElementById('processId').value = `P${processCounter}`;
+            document.getElementById('arrivalTime').value = 0; document.getElementById('burstTime').value = 5; document.getElementById('priority').value = 1;
+            updateProcessList();
+        }
+        function updateProcessList() {
+            const list = document.getElementById('processList');
+            list.innerHTML = processes.map((p, i) => `
+                <div class="process-item" style="border-left: 5px solid ${p.color};">
+                    <div><strong>${p.id}</strong> - Arrival: ${p.arrival}, Burst: ${p.burst}, Priority: ${p.priority}</div>
+                    <button class="btn btn-secondary" onclick="removeProcess(${i})" style="padding: 8px 15px;"><i class="fas fa-times"></i></button>
+                </div>`).join('');
+        }
+        function removeProcess(index) { processes.splice(index, 1); updateProcessList(); }
+        function clearProcesses() {
+            processes = []; processCounter = 1; updateProcessList();
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('llmSection').classList.add('hidden');
+            hideVisualExplanation();
+        }
+
+        // --- SCHEDULING ALGORITHMS (FULL IMPLEMENTATION) ---
+        
+        function fcfs(procs) {
+            const results = JSON.parse(JSON.stringify(procs)).sort((a, b) => a.arrival - b.arrival);
+            let time = 0;
+            const schedule = [];
+
+            results.forEach(p => {
+                if (time < p.arrival) {
+                    schedule.push({ process: 'Idle', start: time, end: p.arrival, color: 'var(--gray)' });
+                    time = p.arrival;
+                }
+                const start = time;
+                p.completion = time + p.burst;
+                p.turnaround = p.completion - p.arrival;
+                p.waiting = start - p.arrival;
+                p.response = start - p.arrival;
+                schedule.push({ process: p.id, start, end: p.completion, color: p.color });
+                time = p.completion;
+            });
+
+            return { schedule, results };
+        }
+
+        function sjf(procs) {
+            const results = [];
+            const schedule = [];
+            let time = 0;
+            const remaining = JSON.parse(JSON.stringify(procs));
+
+            while (remaining.length > 0) {
+                const available = remaining.filter(p => p.arrival <= time).sort((a, b) => a.burst - b.burst);
+
+                if (available.length === 0) {
+                    const nextArrival = Math.min(...remaining.map(p => p.arrival));
+                    schedule.push({ process: 'Idle', start: time, end: nextArrival, color: 'var(--gray)' });
+                    time = nextArrival;
+                    continue;
+                }
+
+                const current = available[0];
+                const index = remaining.findIndex(p => p.id === current.id);
+                remaining.splice(index, 1);
+
+                const start = time;
+                current.completion = time + current.burst;
+                current.turnaround = current.completion - current.arrival;
+                current.waiting = start - current.arrival;
+                current.response = start - current.arrival;
+                
+                results.push(current);
+                schedule.push({ process: current.id, start, end: current.completion, color: current.color });
+                time = current.completion;
+            }
+            return { schedule, results };
+        }
+        
+        function srtf(procs) {
+            const resultsMap = {};
+            procs.forEach(p => {
+                resultsMap[p.id] = { ...p, remaining: p.burst, response: -1 };
+            });
+
+            const schedule = [];
+            let time = 0;
+            let completed = 0;
+            
+            while (completed < procs.length) {
+                const available = Object.values(resultsMap).filter(p => p.arrival <= time && p.remaining > 0);
+                
+                if (available.length === 0) {
+                    const nextArrivalTime = Math.min(...Object.values(resultsMap).filter(p=>p.remaining > 0).map(p => p.arrival));
+                    if(nextArrivalTime > time) {
+                         schedule.push({ process: 'Idle', start: time, end: nextArrivalTime, color: 'var(--gray)' });
+                         time = nextArrivalTime;
+                    } else {
+                         time++;
+                    }
+                    continue;
+                }
+
+                available.sort((a, b) => a.remaining - b.remaining);
+                const current = available[0];
+                
+                if(current.response === -1) current.response = time - current.arrival;
+
+                const lastBlock = schedule[schedule.length - 1];
+                if (lastBlock && lastBlock.process === current.id) {
+                    lastBlock.end++;
+                } else {
+                    schedule.push({ process: current.id, start: time, end: time + 1, color: current.color });
+                }
+                
+                current.remaining--;
+                time++;
+
+                if (current.remaining === 0) {
+                    completed++;
+                    current.completion = time;
+                    current.turnaround = current.completion - current.arrival;
+                    current.waiting = current.turnaround - current.burst;
+                }
+            }
+            return { schedule, results: Object.values(resultsMap) };
+        }
+
+        function priority_non_preemptive(procs) {
+            const results = [];
+            const schedule = [];
+            let time = 0;
+            const remaining = JSON.parse(JSON.stringify(procs));
+
+            while (remaining.length > 0) {
+                const available = remaining.filter(p => p.arrival <= time).sort((a, b) => a.priority - b.priority);
+                
+                if (available.length === 0) {
+                    const nextArrival = Math.min(...remaining.map(p => p.arrival));
+                    schedule.push({ process: 'Idle', start: time, end: nextArrival, color: 'var(--gray)' });
+                    time = nextArrival;
+                    continue;
+                }
+
+                const current = available[0];
+                const index = remaining.findIndex(p => p.id === current.id);
+                remaining.splice(index, 1);
+
+                const start = time;
+                current.completion = time + current.burst;
+                current.turnaround = current.completion - current.arrival;
+                current.waiting = start - current.arrival;
+                current.response = start - current.arrival;
+
+                results.push(current);
+                schedule.push({ process: current.id, start, end: current.completion, color: current.color });
+                time = current.completion;
+            }
+            return { schedule, results };
+        }
+
+        function priority_preemptive(procs) {
+            const resultsMap = {};
+            procs.forEach(p => {
+                resultsMap[p.id] = { ...p, remaining: p.burst, response: -1 };
+            });
+
+            const schedule = [];
+            let time = 0;
+            let completed = 0;
+
+            while (completed < procs.length) {
+                const available = Object.values(resultsMap).filter(p => p.arrival <= time && p.remaining > 0);
+
+                if (available.length === 0) {
+                    const nextArrivalTime = Math.min(...Object.values(resultsMap).filter(p=>p.remaining > 0).map(p => p.arrival));
+                     if(nextArrivalTime > time) {
+                         schedule.push({ process: 'Idle', start: time, end: nextArrivalTime, color: 'var(--gray)' });
+                         time = nextArrivalTime;
+                    } else {
+                         time++;
+                    }
+                    continue;
+                }
+
+                available.sort((a, b) => a.priority - b.priority);
+                const current = available[0];
+
+                if(current.response === -1) current.response = time - current.arrival;
+
+                const lastBlock = schedule[schedule.length - 1];
+                if (lastBlock && lastBlock.process === current.id) {
+                    lastBlock.end++;
+                } else {
+                    schedule.push({ process: current.id, start: time, end: time + 1, color: current.color });
+                }
+
+                current.remaining--;
+                time++;
+
+                if (current.remaining === 0) {
+                    completed++;
+                    current.completion = time;
+                    current.turnaround = current.completion - current.arrival;
+                    current.waiting = current.turnaround - current.burst;
+                }
+            }
+            return { schedule, results: Object.values(resultsMap) };
+        }
+
+        function rr(procs, quantum) {
+            const resultsMap = {};
+            procs.forEach(p => {
+                resultsMap[p.id] = { ...p, remaining: p.burst, response: -1 };
+            });
+            const readyQueue = [];
+            const schedule = [];
+            let time = 0;
+            let completed = 0;
+            let lastArrivalCheck = -1;
+
+            while (completed < procs.length) {
+                Object.values(resultsMap).filter(p => p.arrival > lastArrivalCheck && p.arrival <= time).sort((a,b) => a.arrival - b.arrival).forEach(p => readyQueue.push(p.id));
+                lastArrivalCheck = time;
+
+                if (readyQueue.length === 0) {
+                     const nextArrivalTime = Math.min(...Object.values(resultsMap).filter(p=>p.remaining > 0).map(p => p.arrival));
+                     if(nextArrivalTime > time) {
+                         schedule.push({ process: 'Idle', start: time, end: nextArrivalTime, color: 'var(--gray)' });
+                         time = nextArrivalTime;
+                    } else {
+                         time++;
+                    }
+                    continue;
+                }
+
+                const currentId = readyQueue.shift();
+                const current = resultsMap[currentId];
+
+                if (current.response === -1) current.response = time - current.arrival;
+
+                const runTime = Math.min(quantum, current.remaining);
+                schedule.push({ process: current.id, start: time, end: time + runTime, color: current.color });
+                
+                current.remaining -= runTime;
+                time += runTime;
+
+                Object.values(resultsMap).filter(p => p.arrival > lastArrivalCheck && p.arrival <= time).sort((a,b) => a.arrival - b.arrival).forEach(p => readyQueue.push(p.id));
+                lastArrivalCheck = time;
+
+                if (current.remaining > 0) {
+                    readyQueue.push(currentId);
+                } else {
+                    completed++;
+                    current.completion = time;
+                    current.turnaround = current.completion - current.arrival;
+                    current.waiting = current.turnaround - current.burst;
+                }
+            }
+            return { schedule, results: Object.values(resultsMap) };
+        }
+
+        function ljf(procs) {
+            const results = [];
+            const schedule = [];
+            let time = 0;
+            const remaining = JSON.parse(JSON.stringify(procs));
+
+            while (remaining.length > 0) {
+                const available = remaining.filter(p => p.arrival <= time).sort((a, b) => b.burst - a.burst);
+
+                if (available.length === 0) {
+                    const nextArrival = Math.min(...remaining.map(p => p.arrival));
+                    schedule.push({ process: 'Idle', start: time, end: nextArrival, color: 'var(--gray)' });
+                    time = nextArrival;
+                    continue;
+                }
+
+                const current = available[0];
+                const index = remaining.findIndex(p => p.id === current.id);
+                remaining.splice(index, 1);
+
+                const start = time;
+                current.completion = time + current.burst;
+                current.turnaround = current.completion - current.arrival;
+                current.waiting = start - current.arrival;
+                current.response = start - current.arrival;
+                
+                results.push(current);
+                schedule.push({ process: current.id, start, end: current.completion, color: current.color });
+                time = current.completion;
+            }
+            return { schedule, results };
+        }
+
+        function lrtf(procs) {
+            const resultsMap = {};
+            procs.forEach(p => {
+                resultsMap[p.id] = { ...p, remaining: p.burst, response: -1 };
+            });
+
+            const schedule = [];
+            let time = 0;
+            let completed = 0;
+            
+            while (completed < procs.length) {
+                const available = Object.values(resultsMap).filter(p => p.arrival <= time && p.remaining > 0);
+                
+                if (available.length === 0) {
+                    const nextArrivalTime = Math.min(...Object.values(resultsMap).filter(p=>p.remaining > 0).map(p => p.arrival));
+                    if(nextArrivalTime > time) {
+                         schedule.push({ process: 'Idle', start: time, end: nextArrivalTime, color: 'var(--gray)' });
+                         time = nextArrivalTime;
+                    } else {
+                         time++;
+                    }
+                    continue;
+                }
+
+                available.sort((a, b) => b.remaining - a.remaining);
+                const current = available[0];
+                
+                if(current.response === -1) current.response = time - current.arrival;
+
+                const lastBlock = schedule[schedule.length - 1];
+                if (lastBlock && lastBlock.process === current.id) {
+                    lastBlock.end++;
+                } else {
+                    schedule.push({ process: current.id, start: time, end: time + 1, color: current.color });
+                }
+                
+                current.remaining--;
+                time++;
+
+                if (current.remaining === 0) {
+                    completed++;
+                    current.completion = time;
+                    current.turnaround = current.completion - current.arrival;
+                    current.waiting = current.turnaround - current.burst;
+                }
+            }
+            return { schedule, results: Object.values(resultsMap) };
+        }
+
+        function hrrn(procs) {
+            const results = [];
+            const schedule = [];
+            let time = 0;
+            const remaining = JSON.parse(JSON.stringify(procs));
+
+            while (remaining.length > 0) {
+                let available = remaining.filter(p => p.arrival <= time);
+
+                if (available.length === 0) {
+                    const nextArrival = Math.min(...remaining.map(p => p.arrival));
+                    schedule.push({ process: 'Idle', start: time, end: nextArrival, color: 'var(--gray)' });
+                    time = nextArrival;
+                    continue;
+                }
+
+                available.forEach(p => {
+                    const waitingTime = time - p.arrival;
+                    p.responseRatio = (waitingTime + p.burst) / p.burst;
+                });
+                
+                available.sort((a,b) => b.responseRatio - a.responseRatio);
+                const current = available[0];
+                
+                const index = remaining.findIndex(p => p.id === current.id);
+                remaining.splice(index, 1);
+
+                const start = time;
+                current.completion = time + current.burst;
+                current.turnaround = current.completion - current.arrival;
+                current.waiting = start - current.arrival;
+                current.response = start - current.arrival;
+                
+                results.push(current);
+                schedule.push({ process: current.id, start, end: current.completion, color: current.color });
+                time = current.completion;
+            }
+            return { schedule, results };
+        }
+        
+        // --- INSTANT SIMULATION RUNNER ---
+        function runSimulation() {
+            if (processes.length === 0) { 
+                console.error('Please add at least one process'); 
+                return; 
+            }
+            hideVisualExplanation();
+
+            const algorithm = document.getElementById('algorithm').value;
+            const quantum = parseInt(document.getElementById('quantum').value) || 4;
+            
+            let result;
+            switch(algorithm) {
+                case 'fcfs': result = fcfs(processes); break;
+                case 'sjf': result = sjf(processes); break;
+                case 'srtf': result = srtf(processes); break;
+                case 'priority': result = priority_non_preemptive(processes); break;
+                case 'priority_preemptive': result = priority_preemptive(processes); break;
+                case 'rr': result = rr(processes, quantum); break;
+                case 'ljf': result = ljf(processes); break;
+                case 'lrtf': result = lrtf(processes); break;
+                case 'hrrn': result = hrrn(processes); break;
+                default: result = fcfs(processes); break;
+            }
+            
+            displayResults(result);
+            generateLLMExplanation(algorithm, result);
+        }
+        
+        // --- DISPLAY RESULTS ---
+        function displayResults({ schedule, results }) {
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            // 1. Calculate Metrics
+            const totalTime = schedule.reduce((max, block) => Math.max(max, block.end), 0);
+            const idleTime = schedule.filter(b => b.process === 'Idle').reduce((sum, b) => sum + (b.end - b.start), 0);
+
+            const totalWaiting = results.reduce((sum, r) => sum + r.waiting, 0);
+            const totalTurnaround = results.reduce((sum, r) => sum + r.turnaround, 0);
+            const totalResponse = results.reduce((sum, r) => sum + r.response, 0);
+            
+            const avgWaiting = (totalWaiting / results.length).toFixed(2);
+            const avgTurnaround = (totalTurnaround / results.length).toFixed(2);
+            const avgResponse = (totalResponse / results.length).toFixed(2);
+            const cpuUtilValue = totalTime > 0 ? (((totalTime - idleTime) / totalTime) * 100).toFixed(2) : 0;
+            const throughput = totalTime > 0 ? (results.length / totalTime).toFixed(3) : 0;
+
+            document.getElementById('avgWaiting').textContent = avgWaiting;
+            document.getElementById('avgTurnaround').textContent = avgTurnaround;
+            document.getElementById('avgResponse').textContent = avgResponse;
+            document.getElementById('cpuUtil').textContent = `${cpuUtilValue}%`;
+            document.getElementById('cpuUtilBar').style.width = `${cpuUtilValue}%`;
+            document.getElementById('cpuUtilBar').textContent = `${cpuUtilValue}%`;
+            document.getElementById('throughput').textContent = throughput;
+
+            // 2. Populate Table
+            const tbody = document.getElementById('resultsTableBody');
+            results.sort((a,b) => parseInt(a.id.substring(1)) - parseInt(b.id.substring(1)));
+            tbody.innerHTML = results.map(r => `
+                <tr>
+                    <td><strong>${r.id}</strong></td>
+                    <td>${r.arrival}</td>
+                    <td>${r.burst}</td>
+                    <td>${r.priority}</td>
+                    <td>${r.completion}</td>
+                    <td>${r.turnaround}</td>
+                    <td>${r.waiting}</td>
+                    <td>${r.response}</td>
+                </tr>
+            `).join('');
+
+            // 3. Draw Gantt Chart
+            const ganttChart = document.getElementById('ganttChart');
+            const ganttTimeline = document.getElementById('ganttTimeline');
+            ganttChart.innerHTML = '';
+            ganttTimeline.innerHTML = '';
+
+            const scaleFactor = Math.max(800 / totalTime, 10);
+
+            schedule.forEach(block => {
+                const width = (block.end - block.start) * scaleFactor;
+                const blockDiv = document.createElement('div');
+                blockDiv.className = 'gantt-block';
+                blockDiv.style.width = `${width}px`;
+                blockDiv.style.backgroundColor = block.color;
+                blockDiv.textContent = block.process;
+                ganttChart.appendChild(blockDiv);
+            });
+
+            const uniqueTimes = [...new Set(schedule.flatMap(b => [b.start, b.end]))].sort((a, b) => a - b);
+            
+            uniqueTimes.forEach((t, index) => {
+                const prevTime = index > 0 ? uniqueTimes[index - 1] : 0;
+                const segmentWidth = (t - prevTime) * scaleFactor;
+
+                const markDiv = document.createElement('div');
+                markDiv.className = 'timeline-mark';
+                markDiv.style.width = `${segmentWidth}px`;
+                markDiv.style.textAlign = 'right';
+                markDiv.textContent = t;
+                ganttTimeline.appendChild(markDiv);
+            });
+        }
+        
+        // --- VISUAL EXPLANATION LOGIC ---
+        let visualState = {
+            processes: [],
+            readyQueue: [],
+            runningProcess: null,
+            terminated: [],
+            currentTime: 0,
+            algorithm: 'fcfs',
+            quantum: 4,
+            quantumCounter: 0,
+            isFinished: false
+        };
+
+        function startVisualExplanation() {
+            hideAllSections();
+            document.getElementById('visualExplanationSection').classList.remove('hidden');
+
+            if (processes.length === 0) {
+                addVisualLog("<strong>Error:</strong> Please add at least one process in the 'Process Configuration' section before trying to visualize an algorithm.");
+                document.getElementById('visualNextStepBtn').disabled = true;
+                document.getElementById('visualExplanationTitle').innerText = 'Error';
+                document.getElementById('visualProcessPool').innerHTML = '';
+                document.getElementById('visualReadyQueue').innerHTML = '';
+                document.getElementById('visualCpu').innerHTML = '';
+                return;
+            }
+            
+            visualState.algorithm = document.getElementById('algorithm').value;
+            visualState.quantum = parseInt(document.getElementById('quantum').value) || 4;
+            visualState.processes = JSON.parse(JSON.stringify(processes)).map(p => ({ ...p, remaining: p.burst, hasArrived: false }));
+            visualState.readyQueue = [];
+            visualState.runningProcess = null;
+            visualState.terminated = [];
+            visualState.currentTime = 0;
+            visualState.isFinished = false;
+
+            document.getElementById('visualExplanationTitle').innerText = `How ${visualState.algorithm.toUpperCase()} Works`;
+            document.getElementById('visualNextStepBtn').disabled = false;
+            
+            updateVisualUI();
+            addVisualLog(`<strong>Time ${visualState.currentTime}:</strong> Simulation has started. Click 'Next Step' to proceed.`);
+        }
+
+        function hideVisualExplanation() {
+            document.getElementById('visualExplanationSection').classList.add('hidden');
+        }
+
+        document.getElementById('visualNextStepBtn').addEventListener('click', runVisualStep);
+        
+        function runVisualStep() {
+            if (visualState.isFinished) return;
+
+            const timeBeforeStep = visualState.currentTime;
+            let logMessage = '';
+
+            const arrivals = visualState.processes.filter(p => p.arrival === timeBeforeStep && !p.hasArrived);
+            if (arrivals.length > 0) {
+                arrivals.forEach(p => {
+                    p.hasArrived = true;
+                    visualState.readyQueue.push(p);
+                });
+                logMessage += `Process(es) ${arrivals.map(p => p.id).join(', ')} arrived. Ready Queue updated. `;
+            }
+
+            if (['srtf', 'priority_preemptive', 'lrtf'].includes(visualState.algorithm)) {
+                if (visualState.runningProcess && visualState.readyQueue.length > 0) {
+                    const bestInQueue = [...visualState.readyQueue].sort(getSortFunction())[0];
+                    let shouldPreempt = false;
+                    
+                    if (visualState.algorithm === 'srtf' && bestInQueue.remaining < visualState.runningProcess.remaining) shouldPreempt = true;
+                    if (visualState.algorithm === 'priority_preemptive' && bestInQueue.priority < visualState.runningProcess.priority) shouldPreempt = true;
+                    if (visualState.algorithm === 'lrtf' && bestInQueue.remaining > visualState.runningProcess.remaining) shouldPreempt = true;
+
+                    if (shouldPreempt) {
+                        logMessage += `Preempting ${visualState.runningProcess.id} for ${bestInQueue.id}. `;
+                        visualState.readyQueue.push(visualState.runningProcess);
+                        visualState.runningProcess = null;
+                    }
+                }
+            }
+            
+            if (!visualState.runningProcess && visualState.readyQueue.length > 0) {
+                sortReadyQueue();
+                visualState.runningProcess = visualState.readyQueue.shift();
+                visualState.quantumCounter = 0;
+                logMessage += `CPU is idle. Scheduler selected ${visualState.runningProcess.id} to run. `;
+            }
+
+            if (visualState.runningProcess) {
+                if (logMessage === '') logMessage += `Process ${visualState.runningProcess.id} continues to run. `;
+                visualState.runningProcess.remaining--;
+                visualState.quantumCounter++;
+
+                if (visualState.runningProcess.remaining === 0) {
+                    logMessage += `It has now finished execution. `;
+                    visualState.terminated.push(visualState.runningProcess);
+                    visualState.runningProcess = null;
+                } else if (visualState.algorithm === 'rr' && visualState.quantumCounter >= visualState.quantum) {
+                    logMessage += `Time quantum expired. Moving it to the back of the Ready Queue. `;
+                    visualState.readyQueue.push(visualState.runningProcess);
+                    visualState.runningProcess = null;
+                }
+            } else if (logMessage === '') {
+                logMessage += 'CPU is idle and Ready Queue is empty. ';
+            }
+
+            visualState.currentTime++;
+            
+            addVisualLog(`<strong>Time ${timeBeforeStep}:</strong> ${logMessage}`);
+            sortReadyQueue();
+            updateVisualUI();
+
+            if (visualState.terminated.length === processes.length) {
+                visualState.isFinished = true;
+                addVisualLog(`<strong>All processes have finished at time ${timeBeforeStep + 1}!</strong>`);
+                document.getElementById('visualNextStepBtn').disabled = true;
+            }
+        }
+        
+        function getSortFunction() {
+            switch(visualState.algorithm) {
+                case 'sjf': return (a,b) => a.burst - b.burst;
+                case 'srtf': return (a,b) => a.remaining - b.remaining;
+                case 'priority':
+                case 'priority_preemptive': return (a,b) => a.priority - b.priority;
+                case 'ljf': return (a,b) => b.burst - a.burst;
+                case 'lrtf': return (a,b) => b.remaining - a.remaining;
+                case 'hrrn':
+                    return (a, b) => {
+                        const ratioA = ((visualState.currentTime - a.arrival) + a.burst) / a.burst;
+                        const ratioB = ((visualState.currentTime - b.arrival) + b.burst) / b.burst;
+                        return ratioB - ratioA;
+                    };
+                default: return (a,b) => 0;
+            }
+        }
+
+        function sortReadyQueue() {
+            visualState.readyQueue.sort(getSortFunction());
+        }
+        
+        function updateVisualUI() {
+            const poolDiv = document.getElementById('visualProcessPool');
+            const poolProcesses = visualState.processes.filter(p => !p.hasArrived);
+            poolDiv.innerHTML = poolProcesses.map(p => createVisualProcessCard(p, 'pool')).join('');
+            
+            const readyQueueDiv = document.getElementById('visualReadyQueue');
+            readyQueueDiv.innerHTML = visualState.readyQueue.map(p => createVisualProcessCard(p, 'ready')).join('');
+
+            const cpuDiv = document.getElementById('visualCpu');
+            cpuDiv.innerHTML = visualState.runningProcess ? createVisualProcessCard(visualState.runningProcess, 'cpu') : '';
+        }
+        
+        function createVisualProcessCard(p, type) {
+            let details = `(A:${p.arrival}, B:${p.burst})`;
+            if (type !== 'pool') details = `(Rem: ${p.remaining})`;
+            if (visualState.algorithm.includes('priority')) details += ` (P:${p.priority})`;
+
+            return `<div class="visual-process-card" style="background-color: ${p.color};">
+                        <strong>${p.id}</strong> ${details}
+                    </div>`;
+        }
+
+        function addVisualLog(message) {
+            const logDiv = document.getElementById('visualExplanationLog');
+            logDiv.innerHTML = `<p>${message}</p>`;
+        }
+
+        function hideAllSections(){
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('llmSection').classList.add('hidden');
+            document.getElementById('visualExplanationSection').classList.add('hidden');
+        }
+
+        // --- LLM AND CHAT FUNCTIONS (Using Gemini with API Key) ---
+        const LLM_MODEL = 'gemini-2.5-flash-preview-05-20';
+        const LLM_SYSTEM_INSTRUCTION = "You are a helpful and knowledgeable Operating Systems (OS) and CPU scheduling tutor named 'OS Assistant'. Provide clear, concise, and simple explanations suitable for a student using a simulator. You must respond in less than 200 words. Use Markdown for formatting.";
+        
+        const API_KEY = "AIzaSyAvAfqLM4GQ81DCkcpmcWA6eqRdIEPVlVM"; // This will be provided by the execution environment.
+        
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${LLM_MODEL}:generateContent?key=${API_KEY}`;
+        let isTyping = false;
+
+        async function callGeminiApi(prompt, maxRetries = 5) {
+             if (!API_KEY) {
+                console.warn("API_KEY is not set. Using mock response.");
+                return "AI Assistant is in development mode. Please set an API key to enable live responses.";
+            }
+
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: LLM_SYSTEM_INSTRUCTION }] },
+            };
+
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 && i < maxRetries - 1) {
+                            const delay = Math.pow(2, i) * 1000 + Math.random() * 1000;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            continue;
+                        }
+                        throw new Error(`API call failed: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (text) {
+                        return text;
+                    } else {
+                        throw new Error("Received an empty or malformed response from the API.");
+                    }
+
+                } catch (error) {
+                    console.error(`Gemini API error (Attempt ${i+1}/${maxRetries}):`, error);
+                    if (i === maxRetries - 1) {
+                        return "I'm having trouble connecting to the AI service right now. Please check your internet connection or try again later.";
+                    }
+                }
+            }
+        }
+
+        function toggleChat() {
+            const chatBox = document.getElementById('aiChatBox');
+            chatBox.classList.toggle('hidden-chat');
+            if (!chatBox.classList.contains('hidden-chat')) {
+                document.getElementById('chatInput').focus();
+            }
+        }
+
+        function handleChatInput(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function addMessage(text, isUser, elementId = null) {
+            const chatBody = document.getElementById('chatBody');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = isUser ? 'user-message' : 'ai-message';
+            if (elementId) messageDiv.id = elementId;
+            messageDiv.innerHTML = text;
+            chatBody.appendChild(messageDiv);
+            scrollToBottom();
+            return messageDiv;
+        }
+
+        function scrollToBottom() {
+            const chatBody = document.getElementById('chatBody');
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function sendMessage() {
+            if (isTyping) return;
+            const inputElement = document.getElementById('chatInput');
+            const userQuery = inputElement.value.trim();
+            if (!userQuery) return;
+
+            addMessage(userQuery, true);
+            inputElement.value = '';
+            
+            isTyping = true;
+            inputElement.disabled = true;
+            document.getElementById('chatSendBtn').disabled = true;
+
+            const typingIndicator = `<div class="typing-indicator"></div><div class="typing-indicator"></div><div class="typing-indicator"></div>`;
+            const aiMessageElement = addMessage(typingIndicator, false, `ai-msg-${Date.now()}`);
+            
+            try {
+                const responseText = await callGeminiApi(userQuery);
+                aiMessageElement.innerHTML = responseText.replace(/\n/g, '<br>');
+            } catch (error) {
+                aiMessageElement.innerText = "An error occurred while fetching the response. Please check the console.";
+            } finally {
+                isTyping = false;
+                inputElement.disabled = false;
+                document.getElementById('chatSendBtn').disabled = false;
+                inputElement.focus();
+                scrollToBottom();
+            }
+        }
+        
+        async function generateLLMExplanation(algorithm, result) {
+            const explanationDiv = document.getElementById('llmExplanation');
+            document.getElementById('llmSection').classList.remove('hidden');
+
+            const avgWaiting = document.getElementById('avgWaiting').textContent;
+            const avgTurnaround = document.getElementById('avgTurnaround').textContent;
+            const cpuUtil = document.getElementById('cpuUtil').textContent;
+
+            const prompt = `Analyze the performance of the ${algorithm.toUpperCase()} scheduling algorithm with these metrics: Average Waiting Time = ${avgWaiting}ms, Average Turnaround Time = ${avgTurnaround}ms, CPU Utilization = ${cpuUtil}. Explain what these numbers mean and critique its performance for the given processes.`;
+
+            explanationDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Generating AI Analysis...</p>';
+            
+            try {
+                const llmAnalysis = await callGeminiApi(prompt);
+                explanationDiv.innerHTML = llmAnalysis.replace(/\n/g, '<br>');
+            } catch (error) {
+                explanationDiv.innerHTML = '<p style="color:red;">Error: Could not fetch AI analysis.</p>';
+                console.error("LLM Analysis Error:", error);
+            }
+        }
+
+    </script>
+</body>
+</html>
+
